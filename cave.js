@@ -45,7 +45,13 @@ const YELLOW = '#ffd500'
 const GREEN = '#009b48'
 const ORANGE = '#ff5800'
 const WHITE = '#ffffff'
-const colours = [BLUE, RED, YELLOW, GREEN, ORANGE, WHITE]
+// const colours = [BLUE, RED, YELLOW, GREEN, ORANGE, WHITE]
+
+// retro wave
+const colours = ['#b000ff', '#c801b6', '#ff2975', '#ff911f', 
+  // '#ffd31a'
+];
+
 const DEBUG_PINK = '#ff00ff'
 
 let colours_index = 0;
@@ -371,6 +377,8 @@ function drawStartScreen() {
 
   fill(255);
   textAlign(CENTER, CENTER);
+  textSize(64);
+  text('CAVE GAME', 0, 0 - 200);
   textSize(32);
   text('Tap to Start', 0, 0 + 60);
   textSize(24)
