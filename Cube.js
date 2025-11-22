@@ -1,8 +1,6 @@
 class Cube extends RenderObject {
   constructor(position, angleX, angleY, angleZ, colour, scale) {
 
-
-    
     const points = () => {
       const points = [];
       points.push(createVector(.5, -.5, .5));
@@ -42,5 +40,22 @@ class Cube extends RenderObject {
     ];
 
     super(points(), triangles, position, angleX, angleY, angleZ, colour);
+  }
+
+  isPointInside(x, y, z) {
+    // ignore x
+
+    const insideX = (x > this.position.x - 0.5 && x < this.position.x + 0.5);
+    if (!insideX) {
+      return false;
+    }
+
+    const insideY = (y > this.position.y - 0.5 && y < this.position.y + 0.5);
+    const insideZ = (z > this.position.z - 0.5 && z < this.position.z + 0.5);
+
+    if (insideX && insideY && insideZ) {
+      return true;
+    }
+
   }
 }

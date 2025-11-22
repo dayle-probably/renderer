@@ -46,17 +46,20 @@ const GREEN = '#009b48'
 const ORANGE = '#ff5800'
 const WHITE = '#ffffff'
 // const colours = [BLUE, RED, YELLOW, GREEN, ORANGE, WHITE]
-
-// retro wave
-const colours = ['#b000ff', '#c801b6', '#ff2975', '#ff911f', 
-  // '#ffd31a'
-];
-
 const DEBUG_PINK = '#ff00ff'
+
+const green0 = '#22E513'
+const green1 = '#40E014'
+const green2 = '#7BE115'
+const green3 = '#BBDE19'
+const green4 = '#EBC723'
+const colours = [green0, green1, green2, green3, green4, green3, green2, green1, ]
+const pinch_point_colour = '#A85B07'
 
 let colours_index = 0;
 
 let cubes = [];
+let pinch_cubes = [];
 
 function toggleDrawLoop() {
   if (looping) {
@@ -74,7 +77,10 @@ function toggleDrawLoop() {
 //
 // creates a row of cubes from (x-3 , y, z) to (x+2, y, z)
 const generate_cube_row = (x, y, z, colour) => {
-  cubes.push(new Cube(createVector(0, y, z), 0, 0, 0, colour, createVector(CAVE_WIDTH.value(),1,1)))
+  const newCube = new Cube(createVector(0, y, z), 0, 0, 0, colour, createVector(CAVE_WIDTH.value(),1,1))
+  cubes.push(newCube);
+
+  return newCube;
 };
 
 // x: x coord of the column
@@ -110,6 +116,17 @@ const generateCaveSlice = (y_offset, depth) => {
   previousNoiseValue = y_offset
   colours_index++;
   if (colours_index >= colours.length) colours_index = 0;
+}
+
+const generatePinchPoint = (y_offset, depth, pinch_height) => {
+
+  for (let i = 1; i <= pinch_height; i++) {
+    const bottom_cube = generate_cube_row(0.5, 0 + y_offset - i, depth, pinch_point_colour)
+    const top_cube = generate_cube_row(0.5, -CAVE_HEIGHT.value() + y_offset + i, depth, pinch_point_colour)
+
+    pinch_cubes.push(bottom_cube)
+    pinch_cubes.push(top_cube)
+  }
 }
 
 function setup() {
@@ -240,6 +257,11 @@ const drawGame = () => {
 
     generateCaveSlice(y_climb, STARTING_DEPTH)
 
+    if (frame % 100 === 0) {
+      console.log('frame!', frame);
+      generatePinchPoint(y_climb, STARTING_DEPTH, 3)
+    }
+
     if (score % 25 === 0 && SPEED > MAX_SPEED.value()) {
       SPEED--;
       speedOutputEl.html(`SPEED: ${SPEED}`)
@@ -261,6 +283,7 @@ const drawGame = () => {
 
   // remove cubes that have gone too far
   cubes = cubes.filter(cube => cube.position.z <= 2);
+  // pinch_cubes = pinch_cubes.filter(cube => cube.position.z <= 4);
 
   // drop or rise
   if (isInteracting) {
@@ -292,6 +315,27 @@ const drawGame = () => {
     reset_speed()
     currentState = States.GAME_OVER
   }
+
+  // check for collision with the pinch point cubes
+  // console.log('player:',player);
+  // console.log('cube_y:',cube_y);
+  // if(pinch_cubes.length > 0) {
+  //   for (let i = 0; i < pinch_cubes.length; i++) {
+  //     console.log(`pinch cube ${i}(y,z):`, pinch_cubes[i].position.y, pinch_cubes[i].position.z);
+  //   }
+  // }
+  
+  for (let i = 0; i < cubes.length; i++) {
+    const collision = cubes[i].isPointInside(0, -player.y, 2);
+    if (collision) {
+      console.log('contact with pinch point at cube:', i);
+      player.vel = 0
+      reset_speed()
+      currentState = States.GAME_OVER
+    }
+  }
+
+
   // const camera_vector = createVector(0, -player.y, 1)
   // const sortedCubes = cubes.slice().sort((a, b) => {
   //   const vec_a = p5.Vector.sub(camera_vector, a.position)
@@ -377,8 +421,6 @@ function drawStartScreen() {
 
   fill(255);
   textAlign(CENTER, CENTER);
-  textSize(64);
-  text('CAVE GAME', 0, 0 - 200);
   textSize(32);
   text('Tap to Start', 0, 0 + 60);
   textSize(24)
@@ -434,6 +476,7 @@ function mouseReleased() {
 
 const reset_cubes = () => {
   cubes = []
+  pinch_cubes = []
 }
 
 const is_high_score = () => {
