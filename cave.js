@@ -136,7 +136,7 @@ function setup() {
 
   select('#toggleLoop').mousePressed(toggleDrawLoop);
 
-  CAVE_HEIGHT = new PersistentSetting(createSlider(1, 32, 12), "CAVE_HEIGHT")
+  CAVE_HEIGHT = new PersistentSetting(createSlider(1, 32, 15), "CAVE_HEIGHT")
   CAVE_WIDTH = new PersistentSetting(createSlider(2, 10, 6, 2), "CAVE_WIDTH")
   INITIAL_SPEED = new PersistentSetting(createSlider(1, 32, 12), "INITIALSPEED");
   MAX_SPEED = new PersistentSetting(createSlider(1, 32, 4), "MAXSPEED")
